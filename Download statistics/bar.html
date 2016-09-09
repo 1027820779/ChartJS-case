@@ -1,0 +1,104 @@
+<!doctype html>
+<html>
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+
+    <meta name="renderer" content="webkit">
+
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+
+    <meta http-equiv="pragma" content="no-cache"/>
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, maximum-scale=1.0"/>
+
+    <meta content="telephone=no,email=no" name="format-detection"/>
+    <!--[if IE]>
+    <script src="js/html5.js.js"></script>
+    ＜script src=”http://html5shiv.googlecode.com/svn/trunk/html5.js”>＜/script>
+    <!--IE 低版本，不支持html5，这个插件能提供js扩展库-->
+    <![endif]-->
+    <!--[if lte IE 8]>
+    <script src="js/excanvas.js"></script>
+    <script>
+        Chart.defaults.global.animation = false;
+        //这里主要是为<=IE8做降级处理，因为动画在IE8效果很差
+    </script>
+    <![endif]-->
+    <title>Bar Chart</title>
+    <script src="js/html5.js.js"></script>
+    <script src="js/Chart.js"></script>
+    <script src="js/jquery-1.8.3.js"></script>
+</head>
+<body>
+<!-----选择器按钮---->
+<input class="day" type="button" value="1">
+<input type="button" value="7">
+<input type="button" value="30">
+<input type="button" value="365">
+<!-----创建canvas对象---->
+<canvas id="myChart" width="1200" height="500"></canvas>
+
+<script>
+    $(document).ready(function () {
+//      发送请求，发送数据
+        var name_value = $(".day").val();
+//      触发函数
+        test(name_value);
+//      Ajax发送数据，接受数据
+        function test(n_v) {
+            var ajax = $.ajax({
+                url: "php/new.php",
+                type: "post",
+                data: {"name_value": n_v},
+                dataType: "json",
+                aysnc: "false"
+            });
+
+            ajax.done(function (result) {
+//              区域集合数组
+                var locations = new Array();
+//              集合web用户数组
+                var webs = new Array();
+//              集合app用户数组
+                var apps = new Array();
+
+                for (var i in result) {
+                    var location= result[i]["location"];
+                    var web= result[i]["Web"];
+                    var app= result[i]["App"];
+                    locations.push(location);
+                    webs.push(web);
+                    apps.push(app);
+                }
+
+                var barChartData = {
+                    labels: locations,
+                    datasets: [
+                        {
+                            fillColor: "rgba(220,220,220,0.5)",
+                            strokeColor: "rgba(220,220,220,0.8)",
+                            highlightFill: "rgba(220,220,220,0.75)",
+                            highlightStroke: "rgba(220,220,220,1)",
+                            data:webs
+                        },
+                        {
+                            fillColor: "rgba(151,187,205,0.5)",
+                            strokeColor: "rgba(151,187,205,0.8)",
+                            highlightFill: "rgba(151,187,205,0.75)",
+                            highlightStroke: "rgba(151,187,205,1)",
+                            data: apps
+                        }
+                    ]
+                }
+//              实例化canvas对象
+                var ctx = document.getElementById("myChart").getContext("2d");
+                var myNewChart = new Chart(ctx).Bar(barChartData);
+
+
+
+            });
+        }
+    });
+</script>
+</body>
+</html>
